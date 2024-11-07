@@ -1,0 +1,4 @@
+streamlit==1.25.0        # Streamlit framework for building the dashboard UI
+pandas==1.5.3            # Data handling and manipulation
+requests==2.31.0         # For making HTTP requests to SerpApi and Groq API
+python-dotenv==1.0.0     # For managing environment variables
