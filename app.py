@@ -118,3 +118,11 @@ st.download_button(
     file_name="extracted_data.csv",
     mime="text/csv",
 )
+
+# Error Handling:
+# Extract the entity from the query
+if "{entity}" in result["query"]:
+    entity = result["query"].split("{entity}")[1].strip()  # Adjust to parse entity name if needed
+else:
+    entity = "Unknown Entity"  # Default value if entity extraction fails
+
