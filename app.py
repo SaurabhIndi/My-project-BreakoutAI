@@ -120,9 +120,25 @@ st.download_button(
 )
 
 # Error Handling:
-# Extract the entity from the query
-if "{entity}" in result["query"]:
-    entity = result["query"].split("{entity}")[1].strip()  # Adjust to parse entity name if needed
-else:
-    entity = "Unknown Entity"  # Default value if entity extraction fails
+import streamlit as st
 
+try:
+    # Your existing code where the error might occur
+    query = result["query"]
+    parts = query.split("{entity}")
+    
+    if len(parts) > 1:
+        entity = parts[1]  # Safely access the second part after splitting by "{entity}"
+    else:
+        entity = None  # Handle the case where "{entity}" is not found
+    
+    # Do something with 'entity'
+    st.write(f"Entity: {entity}")
+
+except IndexError as e:
+    # Catch the IndexError and display a custom message without stopping the app
+    st.error("There was an issue with processing the query. Please check the format.")
+    
+except Exception as e:
+    # This catches other exceptions, so nothing breaks the app
+    st.error(f"An unexpected error occurred: {str(e)}")
