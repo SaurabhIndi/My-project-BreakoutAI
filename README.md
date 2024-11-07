@@ -25,7 +25,6 @@ The BreakoutAI Agent Dashboard streamlines the process of information extraction
 1. **Clone the Repository**  
    ```bash
    https://github.com/SaurabhIndi/My-project-BreakoutAI.git
-   cd breakoutai-agent-dashboard
    ```
 
 2. **Install Dependencies**  
