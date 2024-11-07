@@ -1,7 +1,3 @@
-Here's a README.md file based on your template with additional polish and structure:
-
----
-
 # BreakoutAI Agent Dashboard
 
 A Streamlit-based dashboard for automating data extraction and querying web information. This application enables users to upload a CSV file containing entities (e.g., names or organizations), generate customized queries, retrieve search results via SerpApi, and extract specific information (like email addresses) using Groq’s language model API. Results can be exported as a CSV file for easy further use.
@@ -99,5 +95,3 @@ Ensure these keys are stored securely and are not hardcoded in the codebase.
 - **Scalable Query Generation**: The query template with `{entity}` placeholders allows flexible adaptation to different use cases.
 
 ---
-
-Feel free to enhance the README as you add more functionality!
