@@ -87,7 +87,7 @@ To use this app, you will need API keys for both **SerpApi** and **Groq**:
 
 Ensure these keys are stored securely and are not hardcoded in the codebase.
 
-## Optional Features
+## Features
 
 - **Downloadable CSV Output**: Allows downloading the extracted information as a CSV file for sharing or analysis.
 - **Error Handling**: The app is equipped to handle missing or empty search results gracefully, providing users with a smooth experience.
