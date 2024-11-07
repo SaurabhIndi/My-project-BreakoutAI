@@ -4,7 +4,7 @@ import requests
 import time
 
 # Streamlit UI Setup
-st.title("AI Agent Project Dashboard")
+st.title("BreakoutAI Agent Dashboard")
 
 # Upload CSV file
 uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
@@ -15,7 +15,7 @@ if uploaded_file:
 
 # Select main column for queries
 if uploaded_file:
-    main_column = st.selectbox("Select main column for queries", data.columns)
+    main_column = st.selectbox("Select the entity-column for queries", data.columns)
 
 # Query template input
 query_template = st.text_input("Enter your query template (use {entity} as placeholder):", "Retrieve the email address of {entity}")
@@ -29,7 +29,7 @@ if uploaded_file and main_column:
         st.write(query)
 
 # SerpApi web search function
-SERP_API_KEY = '1fea1f5c1703fb9f23b9c18656ff12f79dc6d1fcf2144916ac53f546627fca03'  # Replace with your SerpApi key
+SERP_API_KEY = 'your_serpapi_key'  # Replace with your SerpApi key
 
 def web_search(query):
     url = "https://serpapi.com/search"
@@ -43,26 +43,31 @@ def web_search(query):
 
 # Perform web searches for each query
 search_results = []
-for query in queries:
-    result = web_search(query)
-    if result:
-        search_data = {
-            "query": query,
-            "url": result.get("organic_results")[0]["link"] if result.get("organic_results") else None,
-            "snippet": result.get("organic_results")[0]["snippet"] if result.get("organic_results") else None
-        }
-        search_results.append(search_data)
+try:
+    for query in queries:
+        result = web_search(query)
+        if result and result.get("organic_results"):
+            search_data = {
+                "query": query,
+                "url": result["organic_results"][0].get("link"),
+                "snippet": result["organic_results"][0].get("snippet")
+            }
+            search_results.append(search_data)
+except NameError:
+    st.error("Please upload a file to see the results.")
+except Exception as e:
+    st.error("An unexpected error occurred while performing web searches.")
 
 # Convert search results to DataFrame and display
-results_df = pd.DataFrame(search_results)
-st.write("Search Results:")
-st.dataframe(results_df)
-
-# Optionally, save search results to CSV
-results_df.to_csv("search_results.csv", index=False)
+if search_results:
+    results_df = pd.DataFrame(search_results)
+    st.write("Search Results:")
+    st.dataframe(results_df)
+else:
+    st.warning("No search results available.")
 
 # Groq API setup for language model processing
-GROQ_API_KEY = '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'  # Replace with your Groq API key
+GROQ_API_KEY = 'your_groq_api_key'  # Replace with your Groq API key
 
 def extract_information_with_groq(entity, search_snippet):
     url = "https://api.groq.com/v1/completions"
@@ -71,7 +76,7 @@ def extract_information_with_groq(entity, search_snippet):
         "Content-Type": "application/json"
     }
     data = {
-        "model": "groq-base-1",  # Replace with your preferred Groq model
+        "model": "gemma2-9b-it",  # Replace with your preferred Groq model like "groq-base-1"
         "prompt": f"Extract the email address for {entity} from the following information:\n{search_snippet}\n",
         "max_tokens": 100
     }
@@ -83,62 +88,36 @@ def extract_information_with_groq(entity, search_snippet):
 # Loop through each search result to extract information with Groq
 extracted_data = []
 for result in search_results:
-    entity = result["query"].split("{entity}")[1]  # Adjust to parse entity name if needed
-    snippet = result["snippet"]
-    email = extract_information_with_groq(entity, snippet)
-    
-    extracted_data.append({
-        "entity": entity,
-        "snippet": snippet,
-        "email": email
-    })
-
-# Handle retries for Groq API calls
-def extract_with_retries(entity, snippet, retries=3):
-    for attempt in range(retries):
-        try:
-            return extract_information_with_groq(entity, snippet)
-        except requests.exceptions.RequestException as e:
-            if attempt < retries - 1:
-                time.sleep(2 ** attempt)  # Exponential backoff
-            else:
-                print(f"Failed to retrieve information for {entity}: {e}")
-                return "Error"
+    try:
+        # Use the entity name stored in the original query by splitting on the first occurrence
+        entity = result["query"].replace(query_template.split("{entity}")[0], "").strip()
+        snippet = result.get("snippet", "")
+        email = extract_information_with_groq(entity, snippet)
+        
+        extracted_data.append({
+            "entity": entity,
+            "snippet": snippet,
+            "email": email
+        })
+        
+    except IndexError:
+        pass
+    except Exception as e:
+        st.error("An error occurred while extracting information.")
 
 # Convert extracted data to DataFrame and display
-results_df = pd.DataFrame(extracted_data)
-st.write("Extracted Information:")
-st.dataframe(results_df)
+if extracted_data:
+    extracted_df = pd.DataFrame(extracted_data)
+    st.write("Extracted Information:")
+    st.dataframe(extracted_df)
 
-# Add a Download button for CSV
-csv = results_df.to_csv(index=False)
-st.download_button(
-    label="Download data as CSV",
-    data=csv,
-    file_name="extracted_data.csv",
-    mime="text/csv",
-)
-
-# Error Handling:
-import streamlit as st
-
-try:
-    # Your existing code where the error might occur
-    query = result["query"]
-    parts = query.split("{entity}")
-    
-    if len(parts) > 1:
-        entity = parts[1]  # Safely access the second part after splitting by "{entity}"
-    else:
-        entity = None  # Handle the case where "{entity}" is not found
-    
-    # Do something with 'entity'
-    st.write(f"Entity: {entity}")
-
-except IndexError as e:
-    # Catch the IndexError and display a custom message without stopping the app
-    st.error("There was an issue with processing the query. Please check the format.")
-    
-except Exception as e:
-    # This catches other exceptions, so nothing breaks the app
-    st.error(f"An unexpected error occurred: {str(e)}")
+    # Add a Download button for CSV
+    csv = extracted_df.to_csv(index=False)
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name="extracted_data.csv",
+        mime="text/csv",
+    )
+else:
+    st.warning("No extracted information available.")
