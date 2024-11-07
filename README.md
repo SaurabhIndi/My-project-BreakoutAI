@@ -65,7 +65,7 @@ The BreakoutAI Agent Dashboard streamlines the process of information extraction
 
 ### Connecting Google Sheets
 
-Direct Google Sheets integration is not currently supported. However, you can export data from Google Sheets as a CSV and upload it to the dashboard. For further automation, consider using the Google Sheets API to download CSV data directly.
+Direct Google Sheets integration is not currently supported because Google was not able to verify the Official website (Don't know why !) during Generation of OAuth credentials on Google Cloud Console. However, you can export data from Google Sheets as a CSV and upload it to the dashboard. For further automation, consider using the Google Sheets API to download CSV data directly.
 
 ## API Keys and Environment Variables
 
