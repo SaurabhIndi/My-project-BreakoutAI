@@ -29,7 +29,7 @@ if uploaded_file and main_column:
         st.write(query)
 
 # SerpApi web search function
-SERP_API_KEY = 'your_serpapi_key'  # Replace with your SerpApi key
+SERP_API_KEY = 'a1320db86a46c2881a8241f8eb795e7b58e1434d42b2b45b66dd5df2197a1180'  # Replace with your SerpApi key
 
 def web_search(query):
     url = "https://serpapi.com/search"
@@ -41,18 +41,19 @@ def web_search(query):
     response = requests.get(url, params=params)
     return response.json() if response.status_code == 200 else None
 
-# Perform web searches for each query
+# Perform web searches with loading indicator
 search_results = []
 try:
-    for query in queries:
-        result = web_search(query)
-        if result and result.get("organic_results"):
-            search_data = {
-                "query": query,
-                "url": result["organic_results"][0].get("link"),
-                "snippet": result["organic_results"][0].get("snippet")
-            }
-            search_results.append(search_data)
+    with st.spinner("Performing web searches..."):
+        for query in queries:
+            result = web_search(query)
+            if result and result.get("organic_results"):
+                search_data = {
+                    "query": query,
+                    "url": result["organic_results"][0].get("link"),
+                    "snippet": result["organic_results"][0].get("snippet")
+                }
+                search_results.append(search_data)
 except NameError:
     st.error("Please upload a file to see the results.")
 except Exception as e:
@@ -66,17 +67,20 @@ if search_results:
 else:
     st.warning("No search results available.")
 
-# Groq API setup for language model processing
-GROQ_API_KEY = 'your_groq_api_key'  # Replace with your Groq API key
+# Groq model selection dropdown
+groq_model = st.selectbox("Select Groq model for extraction", ["gemma2-9b-it", "groq-base-1", "groq-medium-2"])
 
-def extract_information_with_groq(entity, search_snippet):
+# Groq API setup for language model processing
+GROQ_API_KEY = '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'  # Replace with your Groq API key
+
+def extract_information_with_groq(entity, search_snippet, model):
     url = "https://api.groq.com/v1/completions"
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
     data = {
-        "model": "gemma2-9b-it",  # Replace with your preferred Groq model like "groq-base-1"
+        "model": model,  # Use selected Groq model
         "prompt": f"Extract the email address for {entity} from the following information:\n{search_snippet}\n",
         "max_tokens": 100
     }
@@ -85,25 +89,26 @@ def extract_information_with_groq(entity, search_snippet):
         return response.json().get("choices", [{}])[0].get("text", "").strip()
     return "Error"
 
-# Loop through each search result to extract information with Groq
+# Loop through each search result to extract information with Groq and loading indicator
 extracted_data = []
-for result in search_results:
-    try:
-        # Use the entity name stored in the original query by splitting on the first occurrence
-        entity = result["query"].replace(query_template.split("{entity}")[0], "").strip()
-        snippet = result.get("snippet", "")
-        email = extract_information_with_groq(entity, snippet)
-        
-        extracted_data.append({
-            "entity": entity,
-            "snippet": snippet,
-            "email": email
-        })
-        
-    except IndexError:
-        pass
-    except Exception as e:
-        st.error("An error occurred while extracting information.")
+with st.spinner("Extracting information with Groq..."):
+    for result in search_results:
+        try:
+            # Use the entity name stored in the original query by splitting on the first occurrence
+            entity = result["query"].replace(query_template.split("{entity}")[0], "").strip()
+            snippet = result.get("snippet", "")
+            email = extract_information_with_groq(entity, snippet, groq_model)
+            
+            extracted_data.append({
+                "entity": entity,
+                "snippet": snippet,
+                "email": email
+            })
+            
+        except IndexError:
+            pass
+        except Exception as e:
+            st.error("An error occurred while extracting information.")
 
 # Convert extracted data to DataFrame and display
 if extracted_data:
