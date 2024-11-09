@@ -67,3 +67,6 @@ API keys for SerpApi and Groq should be entered directly in `app.py` or stored a
 - **Loading Indicators**: Real-time progress indicators provide a user-friendly experience when performing web searches and extractions. 
 
 This tool simplifies automated entity-specific information retrieval and extraction for efficient data analysis. Enjoy using the BreakoutAI Agent Dashboard!
+
+## Video Walkthrough (Loom)
+Check out a [video walkthrough](https://www.loom.com/share/9190d2ab244f4d408f840c9ad40c5183?sid=398388f8-1018-484e-a8a8-0db821b9288d) of the project for an overview and demo!
