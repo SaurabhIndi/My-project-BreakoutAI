@@ -29,7 +29,7 @@ if uploaded_file and main_column:
         st.write(query)
 
 # SerpApi web search function
-SERP_API_KEY = 'a1320db86a46c2881a8241f8eb795e7b58e1434d42b2b45b66dd5df2197a1180'  # Replace with your SerpApi key
+SERP_API_KEY = 'your_serpapi_key'  # Replace with your SerpApi key
 
 def web_search(query):
     url = "https://serpapi.com/search"
@@ -71,7 +71,7 @@ else:
 groq_model = st.selectbox("Select Groq model for extraction", ["gemma2-9b-it", "groq-base-1", "groq-medium-2"])
 
 # Groq API setup for language model processing
-GROQ_API_KEY = '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'  # Replace with your Groq API key
+GROQ_API_KEY = 'your_groq_key'  # Replace with your Groq API key
 
 def extract_information_with_groq(entity, search_snippet, model):
     url = "https://api.groq.com/v1/completions"
