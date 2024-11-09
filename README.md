@@ -25,7 +25,7 @@ streamlit run app.py
 
 ### 4. API Keys Setup
 - **SerpApi Key**: Sign up at [SerpApi](https://serpapi.com/) and retrieve your API key. Replace `SERP_API_KEY` in `app.py` with your actual API key.
-- **Groq API Key**: Sign up at [Groq](https://groq.com/) and get an API key for access to their models. Replace `GROQ_API_KEY` in `app.py` with your actual API key.
+- **Groq API Key**: Sign up at [Groq](https://console.groq.com/keys) and get an API key for access to their models. Replace `GROQ_API_KEY` in `app.py` with your actual API key.
 
 Alternatively, you can store these keys in environment variables for better security:
 ```bash
